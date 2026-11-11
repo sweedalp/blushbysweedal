@@ -2245,7 +2245,8 @@ a {
   z-index: 1;
   overflow: hidden;
   border-radius: 18px;
-  background: #1c1513;
+  background:
+    linear-gradient(180deg, #efe4da 0%, #e8b4b8 55%, #d9c4b8 100%);
 }
 
 .edit-motion-frame video {

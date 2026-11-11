@@ -1952,8 +1952,20 @@ function Issue({ setPage }) {
         </div>
         <div className="edit-motion-grid">
           {[
-            { src: "/media/videos/reel-01.mp4", title: "Glow in motion", note: "Sparkle, turn, repeat.", tag: "Moment 01" },
-            { src: "/media/videos/reel-02.mp4", title: "Soft story cut", note: "A breath of glam on loop.", tag: "Moment 02" },
+            {
+              src: "/media/videos/reel-01.mp4",
+              poster: "/media/videos/reel-01-poster.jpg",
+              title: "Glow in motion",
+              note: "Sparkle, turn, repeat.",
+              tag: "Moment 01",
+            },
+            {
+              src: "/media/videos/reel-02.mp4",
+              poster: "/media/videos/reel-02-poster.jpg",
+              title: "Soft story cut",
+              note: "A breath of glam on loop.",
+              tag: "Moment 02",
+            },
           ].map((item) => (
             <div key={item.src} className="edit-motion look-card">
               <article className="edit-motion-card">
@@ -1976,7 +1988,13 @@ function Issue({ setPage }) {
                   <span className="edit-motion-jewel bl" aria-hidden="true" />
                   <span className="edit-motion-jewel br" aria-hidden="true" />
                   <div className="edit-motion-stage">
-                    <video src={item.src} controls playsInline preload="metadata" />
+                    <video
+                      src={item.src}
+                      poster={item.poster}
+                      controls
+                      playsInline
+                      preload="metadata"
+                    />
                   </div>
                 </div>
               </article>
