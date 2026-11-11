@@ -5294,6 +5294,15 @@ a {
 .intro-overlay.is-gated .intro-finale-flash {
   opacity: 0 !important;
   pointer-events: none;
+  position: absolute !important;
+  visibility: hidden;
+}
+
+.intro-overlay.is-gated {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  justify-items: center;
 }
 
 @keyframes introPortalPulse {
@@ -5318,7 +5327,9 @@ a {
 }
 
 .intro-start-gate {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   z-index: 6;
   display: flex;
   flex-direction: column;
@@ -5326,13 +5337,14 @@ a {
   justify-content: center;
   gap: 0;
   width: min(92vw, 420px);
-  min-height: 420px;
+  min-height: min(70vh, 460px);
   margin: 0;
-  padding: 48px 24px 40px;
+  padding: 24px;
   border: none;
   background: transparent;
   color: #f7ebe3;
   cursor: pointer;
+  transform: translate(-50%, -50%);
   animation: introMistIn 1s ease both;
 }
 
@@ -5349,7 +5361,7 @@ a {
 .intro-start-aura {
   position: absolute;
   left: 50%;
-  top: 42%;
+  top: 38%;
   width: min(72vw, 280px);
   height: min(72vw, 280px);
   transform: translate(-50%, -50%);
@@ -5364,7 +5376,7 @@ a {
 .intro-start-ring {
   position: absolute;
   left: 50%;
-  top: 42%;
+  top: 38%;
   border-radius: 50%;
   border: 1px dashed rgba(226, 201, 146, 0.4);
   pointer-events: none;
