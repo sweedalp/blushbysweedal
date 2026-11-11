@@ -3246,37 +3246,37 @@ function EnchantedIntro({ onReveal, onGone }) {
     }
 
     const timers = [
-      window.setTimeout(() => setPhase("whisper"), 1400),
-      window.setTimeout(() => setPhase("mirror"), 3400),
-      window.setTimeout(() => setWhisperHide(true), 4200),
+      window.setTimeout(() => setPhase("whisper"), 900),
+      window.setTimeout(() => setPhase("mirror"), 2200),
+      window.setTimeout(() => setWhisperHide(true), 2700),
       window.setTimeout(() => {
         setWhisperHide(false);
         setWhisperText("a soft glam fairytale");
         setPhase("whisper2");
-      }, 5200),
-      window.setTimeout(() => setWhisperHide(true), 7000),
-      window.setTimeout(() => setPhase("rings"), 7600),
-      window.setTimeout(() => setPhase("turn"), 8800),
+      }, 3300),
+      window.setTimeout(() => setWhisperHide(true), 4500),
+      window.setTimeout(() => setPhase("rings"), 4850),
+      window.setTimeout(() => setPhase("turn"), 5600),
       window.setTimeout(() => {
         setPhase("float");
         setPetalsOn(true);
-      }, 12200),
+      }, 7800),
       window.setTimeout(() => {
         setPhase("woosh");
         setWooshKey(1);
-      }, 14500),
-      window.setTimeout(() => setPhase("name"), 15800),
+      }, 9250),
+      window.setTimeout(() => setPhase("name"), 10100),
       window.setTimeout(() => {
         setPhase("shimmer");
         setWooshKey(2);
-      }, 17800),
-      window.setTimeout(() => setPhase("tag"), 18800),
+      }, 11350),
+      window.setTimeout(() => setPhase("tag"), 12000),
       window.setTimeout(() => {
         setPhase("welcome");
         setWooshKey(3);
-      }, 20500),
-      window.setTimeout(() => setPhase("finale"), 22000),
-      window.setTimeout(finish, 23500),
+      }, 13100),
+      window.setTimeout(() => setPhase("finale"), 14000),
+      window.setTimeout(finish, 15000),
     ];
     return () => timers.forEach(clearTimeout);
   }, [started]);
