@@ -194,7 +194,7 @@ function BrandLogo({ size = "nav" }) {
         lineHeight: 1.15,
         background: "transparent",
         overflow: "visible",
-        flexShrink: 0,
+        flexShrink: isNav ? 0 : 1,
         maxWidth: "100%",
       }}
     >
@@ -2121,38 +2121,80 @@ function About({ setPage, onAskEnergy }) {
     setGaze({ x, y });
   };
 
+  const getPointerClientY = (e) => {
+    if (typeof e.clientY === "number") return e.clientY;
+    const touch = e.touches?.[0] || e.changedTouches?.[0];
+    return touch?.clientY;
+  };
+
   const updateSplitFromEvent = (clientY) => {
+    if (typeof clientY !== "number") return;
     const el = diptychRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
+    if (!rect.height) return;
     const next = ((clientY - rect.top) / rect.height) * 100;
     setSplit(Math.max(28, Math.min(72, next)));
   };
 
+  const endSeamDrag = () => {
+    if (!splitDrag.current) return;
+    splitDrag.current = false;
+    setSplitting(false);
+  };
+
   const onSeamPointerDown = (e) => {
+    if (e.button != null && e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
     splitDrag.current = true;
     setSplitting(true);
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-    updateSplitFromEvent(e.clientY);
+    try {
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    updateSplitFromEvent(getPointerClientY(e));
   };
 
   const onSeamPointerMove = (e) => {
     if (!splitDrag.current) return;
-    updateSplitFromEvent(e.clientY);
+    e.preventDefault();
+    updateSplitFromEvent(getPointerClientY(e));
   };
 
   const onSeamPointerUp = (e) => {
     if (!splitDrag.current) return;
-    splitDrag.current = false;
-    setSplitting(false);
+    endSeamDrag();
     try {
       e.currentTarget.releasePointerCapture?.(e.pointerId);
     } catch {
       /* ignore */
     }
   };
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!splitDrag.current) return;
+      if (e.cancelable) e.preventDefault();
+      updateSplitFromEvent(getPointerClientY(e));
+    };
+    const onUp = () => endSeamDrag();
+    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onUp);
+    window.addEventListener("touchcancel", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onUp);
+      window.removeEventListener("touchcancel", onUp);
+    };
+  }, []);
 
   const copyBio = async () => {
     try {
@@ -2305,6 +2347,10 @@ function About({ setPage, onAskEnergy }) {
                 ["--warm"]: warmMix,
                 ["--cool"]: coolMix,
               }}
+              onPointerDown={onSeamPointerDown}
+              onPointerMove={onSeamPointerMove}
+              onPointerUp={onSeamPointerUp}
+              onPointerCancel={onSeamPointerUp}
             >
               <div className="about-diptych-pane about-diptych-top">
                 <img src="/media/photos/about.jpeg" alt="" aria-hidden="true" />
@@ -2317,10 +2363,6 @@ function About({ setPage, onAskEnergy }) {
                 aria-valuemin={28}
                 aria-valuemax={72}
                 aria-valuenow={Math.round(split)}
-                onPointerDown={onSeamPointerDown}
-                onPointerMove={onSeamPointerMove}
-                onPointerUp={onSeamPointerUp}
-                onPointerCancel={onSeamPointerUp}
                 onKeyDown={(e) => {
                   if (e.key === "ArrowUp") {
                     e.preventDefault();

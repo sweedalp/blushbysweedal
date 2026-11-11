@@ -3167,12 +3167,14 @@ a {
   right: 0;
   top: var(--split, 50%);
   z-index: 5;
-  height: 44px;
-  margin-top: -22px;
+  height: 56px;
+  margin-top: -28px;
   display: grid;
   place-items: center;
   cursor: ns-resize;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .about-diptych-seam-line {
@@ -3219,6 +3221,21 @@ a {
 .about-diptych:hover .about-diptych-seam-hint,
 .about-diptych.is-splitting .about-diptych-seam-hint {
   opacity: 0.95;
+}
+
+@media (hover: none), (max-width: 900px) {
+  .about-diptych-seam {
+    height: 72px;
+    margin-top: -36px;
+  }
+
+  .about-diptych-seam-hint {
+    opacity: 0.95;
+  }
+
+  .about-diptych {
+    touch-action: none;
+  }
 }
 
 .about-diptych.is-splitting .about-diptych-seam-gem {
@@ -5621,17 +5638,33 @@ svg {
   }
 
   .brand-logo-hero {
-    flex-wrap: wrap;
-    gap: 12px !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 8px !important;
+    max-width: 100%;
   }
 
   .brand-logo-hero .brand-logo-mark {
-    height: 72px !important;
+    height: clamp(42px, 12vw, 58px) !important;
+    flex-shrink: 0;
+  }
+
+  .brand-logo-hero > span {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .brand-logo-hero span span:first-child {
-    font-size: clamp(2.4rem, 9vw, 3.4rem) !important;
-    white-space: normal !important;
+    font-size: clamp(1.55rem, 7.2vw, 2.35rem) !important;
+    white-space: nowrap !important;
+    padding-right: 0.08em !important;
+  }
+
+  .brand-logo-hero span span:last-child {
+    font-size: clamp(0.52rem, 2.4vw, 0.72rem) !important;
+    letter-spacing: 0.14em !important;
+    white-space: nowrap !important;
+    margin-top: 4px !important;
   }
 
   .hero-look-img {
@@ -5700,8 +5733,15 @@ svg {
   }
 
   .about-portrait-orbit {
-    transform: scale(0.92);
-    transform-origin: center top;
+    transform: none;
+  }
+
+  .about-diptych {
+    height: min(72vh, 640px);
+  }
+
+  .about-diptych-pane img {
+    height: min(72vh, 640px);
   }
 
   /* ——— Footer ——— */
@@ -5780,7 +5820,11 @@ svg {
   }
 
   .brand-logo-hero .brand-logo-mark {
-    height: 58px !important;
+    height: clamp(38px, 11vw, 50px) !important;
+  }
+
+  .brand-logo-hero span span:first-child {
+    font-size: clamp(1.35rem, 6.8vw, 1.95rem) !important;
   }
 
   .brand-logo-nav .brand-logo-mark {
