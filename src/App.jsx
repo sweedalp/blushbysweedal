@@ -2121,78 +2121,113 @@ function About({ setPage, onAskEnergy }) {
     setGaze({ x, y });
   };
 
-  const getPointerClientY = (e) => {
-    if (typeof e.clientY === "number") return e.clientY;
-    const touch = e.touches?.[0] || e.changedTouches?.[0];
-    return touch?.clientY;
-  };
-
-  const updateSplitFromEvent = (clientY) => {
-    if (typeof clientY !== "number") return;
-    const el = diptychRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    if (!rect.height) return;
-    const next = ((clientY - rect.top) / rect.height) * 100;
-    setSplit(Math.max(28, Math.min(72, next)));
-  };
-
-  const endSeamDrag = () => {
-    if (!splitDrag.current) return;
-    splitDrag.current = false;
-    setSplitting(false);
-  };
-
-  const onSeamPointerDown = (e) => {
-    if (e.button != null && e.button !== 0) return;
-    e.preventDefault();
-    e.stopPropagation();
-    splitDrag.current = true;
-    setSplitting(true);
-    try {
-      e.currentTarget.setPointerCapture?.(e.pointerId);
-    } catch {
-      /* ignore */
-    }
-    updateSplitFromEvent(getPointerClientY(e));
-  };
-
-  const onSeamPointerMove = (e) => {
-    if (!splitDrag.current) return;
-    e.preventDefault();
-    updateSplitFromEvent(getPointerClientY(e));
-  };
-
-  const onSeamPointerUp = (e) => {
-    if (!splitDrag.current) return;
-    endSeamDrag();
-    try {
-      e.currentTarget.releasePointerCapture?.(e.pointerId);
-    } catch {
-      /* ignore */
-    }
-  };
-
   useEffect(() => {
-    const onMove = (e) => {
-      if (!splitDrag.current) return;
-      if (e.cancelable) e.preventDefault();
-      updateSplitFromEvent(getPointerClientY(e));
+    const el = diptychRef.current;
+    if (!el) return undefined;
+
+    let active = false;
+    let activePointerId = null;
+    let prevBodyOverflow = "";
+    let prevBodyTouchAction = "";
+
+    const clientY = (e) => {
+      if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
+      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
+      if (typeof e.clientY === "number") return e.clientY;
+      return null;
     };
-    const onUp = () => endSeamDrag();
-    window.addEventListener("pointermove", onMove, { passive: false });
-    window.addEventListener("pointerup", onUp);
-    window.addEventListener("pointercancel", onUp);
-    window.addEventListener("touchmove", onMove, { passive: false });
-    window.addEventListener("touchend", onUp);
-    window.addEventListener("touchcancel", onUp);
+
+    const applySplit = (y) => {
+      if (typeof y !== "number") return;
+      const rect = el.getBoundingClientRect();
+      if (!rect.height) return;
+      const next = ((y - rect.top) / rect.height) * 100;
+      setSplit(Math.max(28, Math.min(72, next)));
+    };
+
+    const lockScroll = () => {
+      prevBodyOverflow = document.body.style.overflow;
+      prevBodyTouchAction = document.body.style.touchAction;
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    };
+
+    const unlockScroll = () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.touchAction = prevBodyTouchAction;
+    };
+
+    const start = (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (active) return;
+      active = true;
+      activePointerId = e.pointerId ?? "touch";
+      splitDrag.current = true;
+      setSplitting(true);
+      lockScroll();
+      if (typeof e.pointerId === "number") {
+        try {
+          el.setPointerCapture(e.pointerId);
+        } catch {
+          /* ignore */
+        }
+      }
+      applySplit(clientY(e));
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const move = (e) => {
+      if (!active) return;
+      if (typeof e.pointerId === "number" && activePointerId !== e.pointerId) return;
+      applySplit(clientY(e));
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const end = (e) => {
+      if (!active) return;
+      if (typeof e.pointerId === "number" && activePointerId !== e.pointerId) return;
+      active = false;
+      activePointerId = null;
+      splitDrag.current = false;
+      setSplitting(false);
+      unlockScroll();
+      if (typeof e.pointerId === "number") {
+        try {
+          el.releasePointerCapture(e.pointerId);
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+
+    // Native non-passive listeners so mobile browsers actually allow preventDefault
+    // (React synthetic touch/pointer listeners are often passive and can't stop scroll).
+    const supportsPointer = typeof window.PointerEvent === "function";
+    if (supportsPointer) {
+      el.addEventListener("pointerdown", start, { passive: false });
+      window.addEventListener("pointermove", move, { passive: false });
+      window.addEventListener("pointerup", end);
+      window.addEventListener("pointercancel", end);
+    } else {
+      el.addEventListener("touchstart", start, { passive: false });
+      window.addEventListener("touchmove", move, { passive: false });
+      window.addEventListener("touchend", end);
+      window.addEventListener("touchcancel", end);
+    }
+
     return () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("pointercancel", onUp);
-      window.removeEventListener("touchmove", onMove);
-      window.removeEventListener("touchend", onUp);
-      window.removeEventListener("touchcancel", onUp);
+      unlockScroll();
+      if (supportsPointer) {
+        el.removeEventListener("pointerdown", start);
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", end);
+        window.removeEventListener("pointercancel", end);
+      } else {
+        el.removeEventListener("touchstart", start);
+        window.removeEventListener("touchmove", move);
+        window.removeEventListener("touchend", end);
+        window.removeEventListener("touchcancel", end);
+      }
     };
   }, []);
 
@@ -2347,13 +2382,9 @@ function About({ setPage, onAskEnergy }) {
                 ["--warm"]: warmMix,
                 ["--cool"]: coolMix,
               }}
-              onPointerDown={onSeamPointerDown}
-              onPointerMove={onSeamPointerMove}
-              onPointerUp={onSeamPointerUp}
-              onPointerCancel={onSeamPointerUp}
             >
               <div className="about-diptych-pane about-diptych-top">
-                <img src="/media/photos/about.jpeg" alt="" aria-hidden="true" />
+                <img src="/media/photos/about.jpeg" alt="" aria-hidden="true" draggable={false} />
               </div>
               <div
                 className="about-diptych-seam"
@@ -2381,6 +2412,7 @@ function About({ setPage, onAskEnergy }) {
                 <img
                   src="/media/photos/about.jpeg"
                   alt="Sweedal overlooking mountains at golden hour"
+                  draggable={false}
                 />
               </div>
               <span className="about-portrait-veil" aria-hidden="true" />
@@ -2392,6 +2424,22 @@ function About({ setPage, onAskEnergy }) {
               <span className="about-hour-wash" aria-hidden="true" />
             </div>
           </div>
+
+          <label className="about-peek-control">
+            <span className="about-hour-label">
+              <em>Top</em>
+              <strong>Peek frames</strong>
+              <em>Bottom</em>
+            </span>
+            <input
+              type="range"
+              min={28}
+              max={72}
+              value={split}
+              onChange={(e) => setSplit(Number(e.target.value))}
+              aria-label="Peek between portrait frames"
+            />
+          </label>
 
           <label className="about-hour">
             <span className="about-hour-label">

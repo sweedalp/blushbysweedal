@@ -3113,10 +3113,15 @@ a {
 }
 
 .about-diptych {
+  --diptych-h: min(88vh, 980px);
   position: relative;
-  height: min(88vh, 980px);
+  height: var(--diptych-h);
   touch-action: none;
+  -ms-touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
+  cursor: ns-resize;
+  overscroll-behavior: none;
 }
 
 .about-diptych-pane {
@@ -3140,10 +3145,12 @@ a {
   position: absolute;
   left: 0;
   width: 100%;
-  height: min(88vh, 980px);
+  height: var(--diptych-h);
   object-fit: cover;
   display: block;
   pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
   filter:
     sepia(calc(var(--warm, 0.62) * 0.28))
     saturate(calc(0.92 + var(--warm, 0.62) * 0.28))
@@ -3166,15 +3173,17 @@ a {
   left: 0;
   right: 0;
   top: var(--split, 50%);
-  z-index: 5;
-  height: 56px;
-  margin-top: -28px;
+  z-index: 8;
+  height: 64px;
+  margin-top: -32px;
   display: grid;
   place-items: center;
   cursor: ns-resize;
   touch-action: none;
+  -ms-touch-action: none;
   -webkit-user-select: none;
   user-select: none;
+  pointer-events: none;
 }
 
 .about-diptych-seam-line {
@@ -3224,17 +3233,39 @@ a {
 }
 
 @media (hover: none), (max-width: 900px) {
+  .about-diptych {
+    --diptych-h: min(70vh, 620px);
+    touch-action: none;
+    -ms-touch-action: none;
+  }
+
   .about-diptych-seam {
-    height: 72px;
-    margin-top: -36px;
+    height: 88px;
+    margin-top: -44px;
   }
 
   .about-diptych-seam-hint {
     opacity: 0.95;
+    font-size: 0.72rem;
+    padding: 6px 12px;
   }
 
-  .about-diptych {
-    touch-action: none;
+  .about-diptych-seam-gem {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.about-peek-control {
+  display: none;
+  gap: 10px;
+  margin-top: 18px;
+  max-width: 420px;
+}
+
+@media (hover: none), (max-width: 900px) {
+  .about-peek-control {
+    display: grid;
   }
 }
 
@@ -3295,7 +3326,8 @@ a {
   opacity: 0.75;
 }
 
-.about-hour input[type="range"] {
+.about-hour input[type="range"],
+.about-peek-control input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
@@ -3306,7 +3338,8 @@ a {
   cursor: pointer;
 }
 
-.about-hour input[type="range"]::-webkit-slider-thumb {
+.about-hour input[type="range"]::-webkit-slider-thumb,
+.about-peek-control input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
@@ -3317,7 +3350,8 @@ a {
   box-shadow: 0 6px 14px rgba(58, 46, 42, 0.18);
 }
 
-.about-hour input[type="range"]::-moz-range-thumb {
+.about-hour input[type="range"]::-moz-range-thumb,
+.about-peek-control input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -5734,14 +5768,6 @@ svg {
 
   .about-portrait-orbit {
     transform: none;
-  }
-
-  .about-diptych {
-    height: min(72vh, 640px);
-  }
-
-  .about-diptych-pane img {
-    height: min(72vh, 640px);
   }
 
   /* ——— Footer ——— */
