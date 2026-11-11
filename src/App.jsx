@@ -3157,10 +3157,21 @@ function createIntroSound() {
           /* ignore */
         }
       }
+      return ctx.state === "running";
     },
     play: (cue) => {
-      if (ctx.state === "suspended") return;
-      cues[cue]?.();
+      const run = () => {
+        if (ctx.state === "suspended") return false;
+        cues[cue]?.();
+        return true;
+      };
+      if (run()) return true;
+      ctx.resume?.()
+        .then(() => {
+          run();
+        })
+        .catch(() => {});
+      return false;
     },
     stopAll: () => {
       stopPad(0.4);
@@ -3181,11 +3192,15 @@ function createIntroSound() {
         /* ignore */
       }
     },
+    get state() {
+      return ctx.state;
+    },
   };
 }
 
 function EnchantedIntro({ onReveal, onGone }) {
-  // mist → whisper → mirror → rings → turn → float → woosh → name → shimmer → tag → welcome → finale → exit
+  // gate → mist → whisper → mirror → rings → turn → float → woosh → name → shimmer → tag → welcome → finale → exit
+  const [started, setStarted] = useState(false);
   const [phase, setPhase] = useState("mist");
   const [exiting, setExiting] = useState(false);
   const [whisperHide, setWhisperHide] = useState(false);
@@ -3193,6 +3208,7 @@ function EnchantedIntro({ onReveal, onGone }) {
   const [wooshKey, setWooshKey] = useState(0);
   const [petalsOn, setPetalsOn] = useState(false);
   const doneRef = useRef(false);
+  const startedRef = useRef(false);
   const soundRef = useRef(null);
 
   const finish = () => {
@@ -3210,30 +3226,30 @@ function EnchantedIntro({ onReveal, onGone }) {
   useEffect(() => {
     const sound = createIntroSound();
     soundRef.current = sound;
-
-    const tryUnlock = async () => {
-      await sound.unlock();
-      sound.play("mist");
-    };
-    tryUnlock();
-
-    const unlockOnGesture = async () => {
-      await sound.unlock();
-      sound.play("mist");
-    };
-
-    window.addEventListener("pointerdown", unlockOnGesture, { once: true });
-    window.addEventListener("keydown", unlockOnGesture, { once: true });
-
     return () => {
-      window.removeEventListener("pointerdown", unlockOnGesture);
-      window.removeEventListener("keydown", unlockOnGesture);
       sound.dispose();
       soundRef.current = null;
     };
   }, []);
 
+  const beginIntro = async () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    const sound = soundRef.current;
+    if (sound) {
+      await sound.unlock();
+      // Retry briefly — some mobile browsers need a tick after the gesture.
+      if (sound.state === "suspended") {
+        await new Promise((r) => window.setTimeout(r, 40));
+        await sound.unlock();
+      }
+      sound.play("mist");
+    }
+    setStarted(true);
+  };
+
   useEffect(() => {
+    if (!started) return undefined;
     const map = {
       mist: "mist",
       whisper: "whisper",
@@ -3251,9 +3267,11 @@ function EnchantedIntro({ onReveal, onGone }) {
     };
     const cue = map[phase];
     if (cue && phase !== "mist") soundRef.current?.play(cue);
-  }, [phase]);
+  }, [phase, started]);
 
   useEffect(() => {
+    if (!started) return undefined;
+
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       setPhase("welcome");
@@ -3295,7 +3313,7 @@ function EnchantedIntro({ onReveal, onGone }) {
       window.setTimeout(finish, 23500),
     ];
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [started]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -3388,7 +3406,11 @@ function EnchantedIntro({ onReveal, onGone }) {
   const showCrest = showName;
 
   return (
-    <div className={`intro-overlay${exiting ? " intro-exit" : ""}`} role="dialog" aria-label="Welcome to blushbysweedal">
+    <div
+      className={`intro-overlay${exiting ? " intro-exit" : ""}${started ? " is-started" : " is-gated"}`}
+      role="dialog"
+      aria-label="Welcome to blushbysweedal"
+    >
       <div className={`intro-glow${showName ? " late" : ""}`} aria-hidden="true" />
       <div className={`intro-finale-flash${showFinale ? " play" : ""}`} aria-hidden="true" />
 
@@ -3422,7 +3444,16 @@ function EnchantedIntro({ onReveal, onGone }) {
         />
       ))}
 
-      {petalsOn &&
+      {!started && (
+        <button type="button" className="intro-start-gate" onClick={beginIntro} autoFocus>
+          <img className="intro-start-mark" src="/logo-mark.png" alt="" />
+          <span className="intro-start-title">blushbysweedal</span>
+          <span className="intro-start-sub">Tap to enter with sound</span>
+          <span className="intro-start-cta">Begin the glow</span>
+        </button>
+      )}
+
+      {started && petalsOn &&
         petals.map((p) => (
           <span
             key={`petal-${p.id}`}
@@ -3525,13 +3556,24 @@ function EnchantedIntro({ onReveal, onGone }) {
         <p className={`intro-welcome${showWelcome ? " show" : ""}`}>Welcome to the edit</p>
       </div>
 
-      <div className="intro-progress" aria-hidden="true">
-        <span />
-      </div>
+      {started && (
+        <div className="intro-progress" aria-hidden="true">
+          <span />
+        </div>
+      )}
 
-      <button type="button" className="intro-skip" onClick={finish}>
-        Skip
-      </button>
+      {started && (
+        <button
+          type="button"
+          className="intro-skip"
+          onClick={async () => {
+            await soundRef.current?.unlock();
+            finish();
+          }}
+        >
+          Skip
+        </button>
+      )}
     </div>
   );
 }
