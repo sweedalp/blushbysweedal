@@ -112,6 +112,7 @@ function BrandWordmark({ size = "nav" }) {
 
   return (
     <span
+      className={`brand-wordmark brand-wordmark-${size}`}
       style={{
         display: "inline-flex",
         flexDirection: "column",
@@ -120,15 +121,17 @@ function BrandWordmark({ size = "nav" }) {
         lineHeight: 1.15,
         overflow: "visible",
         minWidth: 0,
+        maxWidth: "100%",
       }}
     >
       <span
+        className="brand-wordmark-name"
         style={{
           fontFamily: '"Great Vibes", cursive',
           fontSize: isNav
             ? "clamp(2.35rem, 3.8vw, 3.1rem)"
             : isFooter
-              ? "2.55rem"
+              ? "clamp(1.85rem, 7vw, 2.55rem)"
               : "clamp(3.9rem, 7.5vw, 6rem)",
           background: isFooter
             ? "linear-gradient(120deg, #f7ebe3 0%, #F2C9CD 45%, #E2C992 100%)"
@@ -138,9 +141,10 @@ function BrandWordmark({ size = "nav" }) {
           color: "transparent",
           letterSpacing: "0.03em",
           fontWeight: 400,
-          whiteSpace: "nowrap",
+          whiteSpace: isFooter ? "normal" : "nowrap",
           overflow: "visible",
           display: "inline-block",
+          maxWidth: "100%",
           padding: "0.12em 0.28em 0.02em 0.04em",
           margin: "-0.12em -0.08em 0 0",
           lineHeight: 1.05,
@@ -151,9 +155,11 @@ function BrandWordmark({ size = "nav" }) {
         blushbysweedal
       </span>
       <span
+        className="brand-wordmark-rule"
         aria-hidden="true"
         style={{
           width: isNav ? "86%" : isFooter ? "78%" : "72%",
+          maxWidth: "100%",
           height: isNav ? 1.5 : 2,
           borderRadius: 99,
           background: `linear-gradient(90deg, ${colors.champagne} 0%, ${colors.blush} 55%, transparent 100%)`,
@@ -162,16 +168,19 @@ function BrandWordmark({ size = "nav" }) {
         }}
       />
       <span
+        className="brand-wordmark-tag"
         style={{
           fontFamily: '"Outfit", sans-serif',
-          fontSize: isNav ? "0.68rem" : isFooter ? "0.82rem" : "0.95rem",
-          letterSpacing: isNav ? "0.22em" : "0.28em",
+          fontSize: isNav ? "0.68rem" : isFooter ? "clamp(0.68rem, 2.8vw, 0.82rem)" : "0.95rem",
+          letterSpacing: isNav ? "0.22em" : isFooter ? "0.14em" : "0.28em",
           textTransform: "uppercase",
           color: isFooter ? "rgba(243,231,223,0.78)" : colors.softInk,
           fontWeight: 500,
-          whiteSpace: "nowrap",
+          whiteSpace: isFooter ? "normal" : "nowrap",
           marginTop: isNav ? 6 : 8,
           overflow: "visible",
+          maxWidth: "100%",
+          lineHeight: 1.35,
         }}
       >
         {brandTagline}
@@ -2880,58 +2889,29 @@ function Footer({ setPage }) {
             paddingBottom: 40,
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
+          <div className="site-footer-brand">
             <img
+              className="site-footer-mark"
               src="/logo-mark.png"
               alt=""
-              style={{ height: 78, width: "auto", background: "transparent", objectFit: "contain" }}
             />
-            <div>
+            <div className="site-footer-brand-copy">
               <BrandWordmark size="footer" />
-              <p
-                style={{
-                  marginTop: 16,
-                  fontSize: "1.08rem",
-                  lineHeight: 1.65,
-                  opacity: 0.8,
-                  maxWidth: 420,
-                }}
-              >
+              <p className="site-footer-blurb">
                 Soft glam fashion stories, beauty moments, and brand-ready features.
               </p>
             </div>
           </div>
 
-          <div>
-            <p
-              style={{
-                fontSize: "0.82rem",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: colors.champagne,
-                marginBottom: 18,
-              }}
-            >
-              Explore
-            </p>
-            <div style={{ display: "grid", gap: 14 }}>
+          <div className="site-footer-col">
+            <p className="site-footer-label">Explore</p>
+            <div className="site-footer-links">
               {links.map(([id, label]) => (
                 <button
                   key={id}
                   type="button"
+                  className="site-footer-link"
                   onClick={() => setPage(id)}
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    color: "#f3e7df",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    padding: 0,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    fontSize: "0.95rem",
-                    opacity: 0.9,
-                  }}
                 >
                   {label}
                 </button>
@@ -2939,48 +2919,23 @@ function Footer({ setPage }) {
             </div>
           </div>
 
-          <div>
-            <p
-              style={{
-                fontSize: "0.82rem",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: colors.champagne,
-                marginBottom: 12,
-              }}
-            >
-              Say hello
-            </p>
-            <a
-              href="mailto:hello.blushbysweedal@gmail.com"
-              style={{ color: "#f3e7df", textDecoration: "none", fontSize: "1.08rem", display: "block", marginBottom: 4 }}
-            >
+          <div className="site-footer-col">
+            <p className="site-footer-label">Say hello</p>
+            <a className="site-footer-contact" href="mailto:hello.blushbysweedal@gmail.com">
               hello.blushbysweedal@gmail.com
             </a>
             <a
+              className="site-footer-contact is-ig"
               href="https://instagram.com/blushbysweedal"
               target="_blank"
               rel="noreferrer"
-              style={{ color: colors.blush, textDecoration: "none", fontSize: "1.08rem", display: "block", lineHeight: 1.2 }}
             >
               @blushbysweedal
             </a>
           </div>
         </div>
 
-        <div
-          style={{
-            width: "100%",
-            borderTop: "1px solid rgba(243,231,223,0.12)",
-            paddingTop: 20,
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            gap: 10,
-            fontSize: "0.92rem",
-            opacity: 0.7,
-          }}
-        >
+        <div className="site-footer-bottom">
           <p>© {new Date().getFullYear()} blushbysweedal</p>
           <p>Enchanted fashion & soft glam</p>
         </div>
