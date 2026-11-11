@@ -3456,11 +3456,18 @@ function EnchantedIntro({ onReveal, onGone }) {
       ))}
 
       {!started && (
-        <button type="button" className="intro-start-gate" onClick={beginIntro} autoFocus>
+        <button type="button" className="intro-start-gate" onClick={beginIntro} autoFocus aria-label="Enter blushbysweedal">
+          <span className="intro-start-aura" aria-hidden="true" />
+          <span className="intro-start-ring outer" aria-hidden="true" />
+          <span className="intro-start-ring inner" aria-hidden="true" />
           <img className="intro-start-mark" src="/logo-mark.png" alt="" />
           <span className="intro-start-title">blushbysweedal</span>
-          <span className="intro-start-sub">Tap to enter with sound</span>
-          <span className="intro-start-cta">Begin the glow</span>
+          <span className="intro-start-flourish" aria-hidden="true">
+            <span className="line" />
+            <span className="diamond" />
+            <span className="line" />
+          </span>
+          <span className="intro-start-cta">Enter</span>
         </button>
       )}
 
