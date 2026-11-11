@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 const colors = {
   ivory: "#FBF6F0",
@@ -2121,9 +2121,35 @@ function About({ setPage, onAskEnergy }) {
     setGaze({ x, y });
   };
 
+  useLayoutEffect(() => {
+    const el = diptychRef.current;
+    if (!el) return undefined;
+
+    const syncDiptychHeight = () => {
+      // Keep image height locked to the real rendered frame so the photo
+      // tracks the seam (mobile vh/min() can otherwise desync the crop).
+      el.style.setProperty("--diptych-h", `${el.clientHeight}px`);
+    };
+    syncDiptychHeight();
+    const resizeObserver = new ResizeObserver(syncDiptychHeight);
+    resizeObserver.observe(el);
+    window.addEventListener("resize", syncDiptychHeight);
+    window.addEventListener("orientationchange", syncDiptychHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", syncDiptychHeight);
+      window.removeEventListener("orientationchange", syncDiptychHeight);
+    };
+  }, []);
+
   useEffect(() => {
     const el = diptychRef.current;
     if (!el) return undefined;
+
+    const syncDiptychHeight = () => {
+      el.style.setProperty("--diptych-h", `${el.clientHeight}px`);
+    };
 
     let active = false;
     let activePointerId = null;
@@ -2141,6 +2167,7 @@ function About({ setPage, onAskEnergy }) {
       if (typeof y !== "number") return;
       const rect = el.getBoundingClientRect();
       if (!rect.height) return;
+      syncDiptychHeight();
       const next = ((y - rect.top) / rect.height) * 100;
       setSplit(Math.max(28, Math.min(72, next)));
     };
@@ -2424,22 +2451,6 @@ function About({ setPage, onAskEnergy }) {
               <span className="about-hour-wash" aria-hidden="true" />
             </div>
           </div>
-
-          <label className="about-peek-control">
-            <span className="about-hour-label">
-              <em>Top</em>
-              <strong>Peek frames</strong>
-              <em>Bottom</em>
-            </span>
-            <input
-              type="range"
-              min={28}
-              max={72}
-              value={split}
-              onChange={(e) => setSplit(Number(e.target.value))}
-              aria-label="Peek between portrait frames"
-            />
-          </label>
 
           <label className="about-hour">
             <span className="about-hour-label">

@@ -3113,9 +3113,9 @@ a {
 }
 
 .about-diptych {
-  --diptych-h: min(88vh, 980px);
+  --diptych-h: 100%;
   position: relative;
-  height: var(--diptych-h);
+  height: min(88vh, 980px);
   touch-action: none;
   -ms-touch-action: none;
   user-select: none;
@@ -3129,6 +3129,7 @@ a {
   left: 0;
   right: 0;
   overflow: hidden;
+  z-index: 1;
 }
 
 .about-diptych-top {
@@ -3137,8 +3138,9 @@ a {
 }
 
 .about-diptych-bot {
+  top: var(--split, 50%);
   bottom: 0;
-  height: calc(100% - var(--split, 50%));
+  height: auto;
 }
 
 .about-diptych-pane img {
@@ -3146,11 +3148,13 @@ a {
   left: 0;
   width: 100%;
   height: var(--diptych-h);
+  max-width: none;
   object-fit: cover;
   display: block;
   pointer-events: none;
   -webkit-user-drag: none;
   user-select: none;
+  will-change: height;
   filter:
     sepia(calc(var(--warm, 0.62) * 0.28))
     saturate(calc(0.92 + var(--warm, 0.62) * 0.28))
@@ -3160,10 +3164,12 @@ a {
 
 .about-diptych-top img {
   top: 0;
+  bottom: auto;
   object-position: center top;
 }
 
 .about-diptych-bot img {
+  top: auto;
   bottom: 0;
   object-position: center bottom;
 }
@@ -3234,7 +3240,7 @@ a {
 
 @media (hover: none), (max-width: 900px) {
   .about-diptych {
-    --diptych-h: min(70vh, 620px);
+    height: min(70vh, 620px);
     touch-action: none;
     -ms-touch-action: none;
   }
@@ -3253,19 +3259,6 @@ a {
   .about-diptych-seam-gem {
     width: 22px;
     height: 22px;
-  }
-}
-
-.about-peek-control {
-  display: none;
-  gap: 10px;
-  margin-top: 18px;
-  max-width: 420px;
-}
-
-@media (hover: none), (max-width: 900px) {
-  .about-peek-control {
-    display: grid;
   }
 }
 
@@ -3326,8 +3319,7 @@ a {
   opacity: 0.75;
 }
 
-.about-hour input[type="range"],
-.about-peek-control input[type="range"] {
+.about-hour input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
@@ -3338,8 +3330,7 @@ a {
   cursor: pointer;
 }
 
-.about-hour input[type="range"]::-webkit-slider-thumb,
-.about-peek-control input[type="range"]::-webkit-slider-thumb {
+.about-hour input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
@@ -3350,8 +3341,7 @@ a {
   box-shadow: 0 6px 14px rgba(58, 46, 42, 0.18);
 }
 
-.about-hour input[type="range"]::-moz-range-thumb,
-.about-peek-control input[type="range"]::-moz-range-thumb {
+.about-hour input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
