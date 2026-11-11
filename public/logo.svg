@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" role="img" aria-label="blushbysweedal">
+  <defs>
+    <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8D09A"/>
+      <stop offset="50%" stop-color="#C6A875"/>
+      <stop offset="100%" stop-color="#A8894F"/>
+    </linearGradient>
+    <linearGradient id="blushFill" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#F4D0D4"/>
+      <stop offset="45%" stop-color="#E8B4B8"/>
+      <stop offset="100%" stop-color="#C97B84"/>
+    </linearGradient>
+    <linearGradient id="deepRose" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D29199"/>
+      <stop offset="100%" stop-color="#A85C66"/>
+    </linearGradient>
+    <linearGradient id="script" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3A2E2A"/>
+      <stop offset="55%" stop-color="#C97B84"/>
+      <stop offset="100%" stop-color="#8F5A5F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- crest mark -->
+  <g transform="translate(8,10)">
+    <circle cx="60" cy="60" r="58" fill="#FBF6F0"/>
+    <circle cx="60" cy="60" r="54" fill="none" stroke="url(#goldRing)" stroke-width="2"/>
+    <circle cx="60" cy="60" r="48" fill="none" stroke="#E8B4B8" stroke-width="0.8" opacity="0.5"/>
+    <path d="M36 74 C42 48 66 40 82 54 C68 50 54 58 48 74 Z" fill="url(#blushFill)" opacity="0.35"/>
+    <text x="44" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="50" font-style="italic" font-weight="700" fill="url(#blushFill)">b</text>
+    <text x="74" y="76" text-anchor="middle" font-family="Georgia, serif" font-size="44" font-style="italic" font-weight="700" fill="url(#deepRose)">S</text>
+    <path d="M94 30l1.3 3.3 3.3 1.3-3.3 1.3L94 39.2l-1.3-3.3L89.4 34.6l3.3-1.3z" fill="#C6A875"/>
+  </g>
+
+  <!-- wordmark -->
+  <text
+    x="150"
+    y="78"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="42"
+    font-style="italic"
+    fill="url(#script)"
+  >blushbysweedal</text>
+  <path d="M152 92 C230 82 360 82 448 94" fill="none" stroke="#C6A875" stroke-width="1.2" stroke-linecap="round"/>
+</svg>
